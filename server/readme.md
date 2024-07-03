@@ -1,4 +1,12 @@
-# Velero API Dokümantasyonu
+# Kurulum
+
+Server dizini içerisindeki **install.sh** dosyasını çalıştırarak sisteminize kurabilirsiniz.
+- Başlatmak için: **sudo systemctl start scube**
+- Durdurmak için: **sudo systemctl stop scube**
+- Durumunu kontrol etmek için: **sudo systemctl status scube**
+
+
+# API Dokümantasyonu
 
 ## Genel Bakış
 Bu dokümantasyon, Kubernetes kümesinde yedeklemeleri, geri yüklemeleri,  bucketları,  scheduleları ve durum bilgilerini yönetmek için kullanılan Velero API uç noktalarının bir özetini sunar.
