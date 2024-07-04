@@ -13,12 +13,13 @@ import {
   Button,
 } from "@mui/material";
 import axios from "axios";
-import { GetDeployments } from "../../utils";
+import { GetDeployments, GetNamespaces } from "../../utils";
 import { GetAllBuckets } from "../../utils/buckets";
 
 export default function CreateBackup({ open, handleClose }) {
   const [deployments, setDeployments] = useState([]);
   const [buckets, setBuckets] = useState([]);
+  const [namespaces, setNameSpaces] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     namespaces: [],
@@ -33,7 +34,9 @@ export default function CreateBackup({ open, handleClose }) {
       try {
         const dep = await GetDeployments();
         const bucs = await GetAllBuckets();
+        const ns = await GetNamespaces();
 
+        setNameSpaces(ns.map((n) => n.name));
         setDeployments(dep.map((d) => d.name));
         setBuckets(bucs.map((b) => b.name));
       } catch (error) {
@@ -98,7 +101,7 @@ export default function CreateBackup({ open, handleClose }) {
             onChange={handleSelectChange("namespaces")}
             renderValue={(selected) => selected.join(", ")}
           >
-            {["default", "my-namespace", "other-namespace"].map((namespace) => (
+            {namespaces.map((namespace) => (
               <MenuItem key={namespace} value={namespace}>
                 <Checkbox
                   checked={formData.namespaces.indexOf(namespace) > -1}

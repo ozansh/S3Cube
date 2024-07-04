@@ -36,7 +36,7 @@ const CreateBucket = ({ open, handleClose }) => {
     };
 
     // POST request to your API endpoint
-    fetch("/api/createBucket", {
+    fetch("/buckets", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

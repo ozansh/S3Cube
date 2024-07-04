@@ -42,3 +42,13 @@ export const DeleteBucket = async (id) => {
     return { error: "An error occurred" };
   }
 };
+
+export const GetBackupsFromSpesificBucekt = async (bucket) => {
+  try {
+    const response = await axios.get(`/backups?bucket=${bucket}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};

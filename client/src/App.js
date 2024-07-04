@@ -3,7 +3,7 @@ import Layout from "./components/Layout";
 import Objects from "./components/Objects";
 import Buckets from "./components/Buckets";
 import Backups from "./components/Backups";
-import Credentials from "./components/Credentials";
+import BucketBackups from "./components/Buckets/ListBackups";
 
 function App() {
   return (
@@ -30,6 +30,14 @@ function App() {
           element={
             <Layout>
               <Backups />
+            </Layout>
+          }
+        />
+        <Route
+          path="/backups/buckets/:bucketName"
+          element={
+            <Layout>
+              <BucketBackups />
             </Layout>
           }
         />

@@ -123,39 +123,41 @@ export default function Backups() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {backups?.map((row, index) => (
-              <TableRow
-                key={index}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell align="left">{row.name}</TableCell>
-                <TableCell align="center">{row.bucket}</TableCell>
-                <TableCell align="center">
-                  {HumanReadableDate(row.created_at)}
-                </TableCell>
-                <TableCell align="center">
-                  {row.hasPersistentVolumes ? "Yes" : "No"}
-                </TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleRestore(row.name)}
-                  >
-                    <RestoreIcon />
-                  </IconButton>
-                </TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDelete(row.name)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {backups
+              ?.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+              .map((row, index) => (
+                <TableRow
+                  key={index}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell align="left">{row.name}</TableCell>
+                  <TableCell align="center">{row.bucket}</TableCell>
+                  <TableCell align="center">
+                    {HumanReadableDate(row.created_at)}
+                  </TableCell>
+                  <TableCell align="center">
+                    {row.hasPersistentVolumes ? "Yes" : "No"}
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleRestore(row.name)}
+                    >
+                      <RestoreIcon />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton
+                      variant="contained"
+                      color="error"
+                      onClick={() => handleDelete(row.name)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

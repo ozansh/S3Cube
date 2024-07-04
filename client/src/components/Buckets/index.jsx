@@ -35,7 +35,7 @@ export default function Buckets() {
 
   async function handleDelete(bucketName) {
     try {
-      const response = await axios.delete(`/bucket/${bucketName}`);
+      const response = await axios.delete(`/buckets/${bucketName}`);
 
       if (response.status !== 200) {
         console.error(response.data.error);
@@ -85,7 +85,18 @@ export default function Buckets() {
                 key={index}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                <TableCell align="left">{row.name}</TableCell>
+                <TableCell align="left">
+                  <Button
+                    variant="text"
+                    color="primary"
+                    onClick={() =>
+                      (window.location.href = `/backups/buckets/${row.name}`)
+                    }
+                    sx={{ textTransform: "none", color: "black" }}
+                  >
+                    {row.name}
+                  </Button>
+                </TableCell>
                 <TableCell align="center">
                   <IconButton
                     variant="contained"

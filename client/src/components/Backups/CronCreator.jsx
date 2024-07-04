@@ -70,7 +70,6 @@ export default function CronCreator({ open, handleClose, namespaces }) {
 
     try {
       const response = await axios.post("/api/cron-backup", payload);
-      console.log(response.data);
       handleClose();
     } catch (error) {
       console.error(error);
