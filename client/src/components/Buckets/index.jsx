@@ -22,14 +22,14 @@ export default function Buckets() {
   const [openCreate, setOpenCreate] = useState(false);
   const [namespaces, setNamespaces] = useState([]);
 
-  useEffect(() => {
-    const fetchBuckets = async () => {
-      const ns = await GetNamespaces();
-      const response = await axios.get("/buckets?bucket=all");
-      setBuckets(response.data);
-      setNamespaces(ns);
-    };
+  const fetchBuckets = async () => {
+    const ns = await GetNamespaces();
+    const response = await axios.get("/buckets?bucket=all");
+    setBuckets(response.data);
+    setNamespaces(ns);
+  };
 
+  useEffect(() => {
     fetchBuckets();
   }, []);
 
@@ -114,6 +114,7 @@ export default function Buckets() {
 
       <CreateBucketComponent
         open={openCreate}
+        fetchBuckets={fetchBuckets}
         handleClose={handleCreateClose}
         namespaces={namespaces}
       />

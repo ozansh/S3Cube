@@ -16,18 +16,18 @@ import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RestoreIcon from "@mui/icons-material/Restore";
 import { GetBackupsFromSpesificBucekt } from "../../utils/buckets";
+import { useParams } from "react-router-dom";
 
 export default function BucketBackups() {
   const [backups, setBackups] = useState([]);
   const [restoreStatus, setRestoreStatus] = useState("");
 
   // FETCH PARAM FROM URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const bucket = urlParams.get("bucketName");
+  const { bucketName } = useParams();
 
   React.useEffect(() => {
     const getBackups = async () => {
-      const response = await GetBackupsFromSpesificBucekt(bucket);
+      const response = await GetBackupsFromSpesificBucekt(bucketName);
       setBackups(response);
     };
 

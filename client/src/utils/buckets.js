@@ -46,6 +46,7 @@ export const DeleteBucket = async (id) => {
 export const GetBackupsFromSpesificBucekt = async (bucket) => {
   try {
     const response = await axios.get(`/backups?bucket=${bucket}`);
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error(error);

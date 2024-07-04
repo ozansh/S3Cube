@@ -10,7 +10,7 @@ import {
   InputLabel,
 } from "@mui/material";
 
-const CreateBucket = ({ open, handleClose }) => {
+const CreateBucket = ({ open, handleClose, fetchBuckets }) => {
   const [provider, setProvider] = useState("");
   const [bucketName, setBucketName] = useState("");
   const [credentials, setCredentials] = useState({});
@@ -43,9 +43,9 @@ const CreateBucket = ({ open, handleClose }) => {
       },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
+        fetchBuckets();
         handleClose();
       })
       .catch((error) => {
