@@ -31,7 +31,7 @@ export default function Backups() {
       const ns = await GetNamespaces();
       const response = await axios.get("/backups?bucket=all");
       setBackups(response.data);
-      setNamespaces(ns);
+      setNamespaces(ns.map((n) => n.name));
     };
 
     fetchBackups();
