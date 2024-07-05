@@ -32,6 +32,7 @@ export default function CronCreator({ open, handleClose }) {
       month: "*",
       dayOfWeek: "*",
     },
+    predefinedSchedule: "",
     namespaces: [],
     deployments: [],
     bucket: "",
@@ -47,6 +48,7 @@ export default function CronCreator({ open, handleClose }) {
         ...formData.schedule,
         [field]: event.target.value,
       },
+      predefinedSchedule: "", // Clear predefined schedule when custom schedule is modified
     });
   };
 
@@ -62,6 +64,53 @@ export default function CronCreator({ open, handleClose }) {
     setFormData({
       ...formData,
       [name]: event.target.value,
+    });
+  };
+
+  const handlePredefinedScheduleChange = (event) => {
+    const predefinedSchedule = event.target.value;
+    let schedule;
+    switch (predefinedSchedule) {
+      case "Every Minute":
+        schedule = {
+          minute: "*",
+          hour: "*",
+          dayOfMonth: "*",
+          month: "*",
+          dayOfWeek: "*",
+        };
+        break;
+      case "Every Day":
+        schedule = {
+          minute: "0",
+          hour: "0",
+          dayOfMonth: "*",
+          month: "*",
+          dayOfWeek: "*",
+        };
+        break;
+      case "Every Week":
+        schedule = {
+          minute: "0",
+          hour: "0",
+          dayOfMonth: "*",
+          month: "*",
+          dayOfWeek: "0",
+        };
+        break;
+      default:
+        schedule = {
+          minute: "*",
+          hour: "*",
+          dayOfMonth: "*",
+          month: "*",
+          dayOfWeek: "*",
+        };
+    }
+    setFormData({
+      ...formData,
+      schedule,
+      predefinedSchedule,
     });
   };
 
@@ -136,6 +185,17 @@ export default function CronCreator({ open, handleClose }) {
             fullWidth
             margin="normal"
           />
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Predefined Schedule</InputLabel>
+            <Select
+              value={formData.predefinedSchedule}
+              onChange={handlePredefinedScheduleChange}
+            >
+              <MenuItem value="Every Minute">Every Minute</MenuItem>
+              <MenuItem value="Every Day">Every Day</MenuItem>
+              <MenuItem value="Every Week">Every Week</MenuItem>
+            </Select>
+          </FormControl>
           <Grid container spacing={2} marginBottom={2}>
             <Grid item xs={6}>
               <FormControl fullWidth>
