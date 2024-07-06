@@ -1,5 +1,7 @@
 const { exec } = require('child_process');
 const bodyParser = require('body-parser');
+const fs = require('fs');
+const path = require('path');
 
 const createBucket = ({ provider, bucketName, credentials }) => {
   return new Promise((resolve, reject) => {
@@ -13,8 +15,47 @@ const createBucket = ({ provider, bucketName, credentials }) => {
 
     switch (provider) {
       case 'aws':
-        secretCommand = `kubectl create secret generic ${secretName} --from-literal=aws_access_key_id=${credentials.aws_access_key_id} --from-literal=aws_secret_access_key=${credentials.aws_secret_access_key} -n velero`;
-        config = `region=${credentials.region}`;
+        // Create temporary AWS credentials file
+        const awsCredentialsContent = `[default]
+aws_access_key_id=${credentials.aws_access_key_id}
+aws_secret_access_key=${credentials.aws_secret_access_key}`;
+
+        const tempFilePath = path.join('/tmp', `${secretName}-aws-credentials`);
+
+        fs.writeFile(tempFilePath, awsCredentialsContent, (err) => {
+          if (err) {
+            console.error(`Failed to write AWS credentials file: ${err}`);
+            return reject(err);
+          }
+
+          secretCommand = `kubectl create secret generic ${secretName} --from-file=cloud=${tempFilePath} -n velero`;
+          config = `region=${credentials.region}`;
+
+          console.log('Secret Command:', secretCommand);  
+          console.log('Config:', config);  
+
+          exec(secretCommand, (secretError, secretStdout, secretStderr) => {
+            if (secretError) {
+              console.error(`Secret creation error: ${secretError}`);
+              return reject(secretStderr);
+            }
+
+            console.log('Secret creation success:', secretStdout);  
+
+            const backupCommand = `velero backup-location create ${bucketName} --provider aws --bucket ${bucketName} --config ${config} --credential ${secretName}=cloud`;
+            console.log('Backup Command:', backupCommand);  
+
+            exec(backupCommand, (backupError, backupStdout, backupStderr) => {
+              if (backupError) {
+                console.error(`Backup location creation error: ${backupError}`);
+                return reject(backupStderr);
+              }
+              console.log('Backup location creation success:', backupStdout);  
+              resolve(backupStdout);
+            });
+          });
+        });
+
         break;
 
       case 'azure':
@@ -29,27 +70,27 @@ AZURE_CLOUD_NAME=AzurePublicCloud`;
         config = `resourceGroup=${credentials.azure_resourceGroup},storageAccount=${credentials.azure_storageAccount}`;
         break;
 
-      case 'gcp':
-        const gcpSecretContent = `
-{
-  "type": "service_account",
-  "project_id": "${credentials.gcp_project}",
-  "private_key_id": "some-private-key-id",
-  "private_key": "${credentials.gcp_private_key.replace(/\\n/g, '\n')}",
-  "client_email": "${credentials.gcp_client_email}",
-  "client_id": "some-client-id",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/${credentials.gcp_client_email}"
-}`;
-        secretCommand = `echo '${gcpSecretContent}' | kubectl create secret generic ${secretName} --from-file=cloud=/dev/stdin -n velero`;
-        config = `project=${credentials.gcp_project}`;
-        break;
-
-      default:
-        return reject(new Error('Unsupported provider'));
-    }
+        case 'gcp':
+          const gcpSecretContent = `
+  {
+    "type": "service_account",
+    "project_id": "${credentials.gcp_project}",
+    "private_key_id": "${credentials.gcp_private_key_id}",
+    "private_key": "${credentials.gcp_private_key.replace(/\\n/g, '\\n')}",
+    "client_email": "${credentials.gcp_client_email}",
+    "client_id": "${credentials.gcp_client_id}",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/${credentials.gcp_client_email}"
+  }`;
+          secretCommand = `echo '${gcpSecretContent}' | kubectl create secret generic ${secretName} --from-file=cloud=/dev/stdin -n velero`;
+          config = `project=${credentials.gcp_project}`;
+          break;
+  
+        default:
+          return reject(new Error('Unsupported provider'));
+      }
 
     console.log('Secret Command:', secretCommand);  
     console.log('Config:', config);  
